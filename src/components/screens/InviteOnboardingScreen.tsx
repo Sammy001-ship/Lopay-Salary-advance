@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { AppScreen } from '../../types';
 
 interface InviteOnboardingScreenProps {
   onVerifyAndEnter: () => void;
-  onNavigate: (screen: AppScreen) => void;
+  onNavigate?: (screen: string) => void;
 }
 
 export const InviteOnboardingScreen: React.FC<InviteOnboardingScreenProps> = ({

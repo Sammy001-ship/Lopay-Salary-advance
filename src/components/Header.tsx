@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { IMAGES } from '../data/mockData';
-import { AppScreen } from '../types';
+import { TeacherScreen } from '../types';
 
 interface HeaderProps {
-  currentScreen: AppScreen;
-  onNavigate: (screen: AppScreen) => void;
+  currentScreen: TeacherScreen;
+  onNavigate: (screen: TeacherScreen) => void;
   onBack?: () => void;
   showBack?: boolean;
   unreadCount?: number;
+  onLogout?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -16,6 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
   onBack,
   showBack = false,
   unreadCount = 2,
+  onLogout,
 }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -23,19 +25,15 @@ export const Header: React.FC<HeaderProps> = ({
   const getSubtitle = () => {
     switch (currentScreen) {
       case 'dashboard':
-        return 'Dashboard';
+        return 'Teacher Dashboard';
       case 'request-advance':
         return 'Request Advance';
-      case 'teachers':
-        return 'Teacher Directory';
       case 'advances':
         return 'Advance Activity';
       case 'settings':
         return 'Account Settings';
-      case 'onboarding-invite':
-        return 'Faculty Onboarding';
       default:
-        return 'Dashboard';
+        return 'Teacher Dashboard';
     }
   };
 
@@ -66,7 +64,7 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="text-[13px] font-semibold text-[#0b1c30] leading-none truncate">
                 Lopay
               </span>
-              <span className="text-[11px] text-[#45464d] font-medium leading-tight truncate">
+              <span className="text-[11px] text-[#006c49] font-medium leading-tight truncate">
                 {getSubtitle()}
               </span>
             </div>
@@ -94,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
               <img
                 alt="Sarah Jenkins Profile"
                 src={IMAGES.profileSarah}
-                className="w-8 h-8 rounded-full object-cover ring-2 ring-[#006c49]/30"
+                className="w-8 h-8 rounded-full object-cover ring-2 ring-[#006c49]/40"
               />
             </button>
           </div>
@@ -111,7 +109,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="flex items-center justify-between pb-2 border-b border-[#eff4ff]">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-[20px] text-[#006c49]">notifications_active</span>
-                <h3 className="text-sm font-semibold text-[#0b1c30]">School & Wage Alerts</h3>
+                <h3 className="text-sm font-semibold text-[#0b1c30]">School &amp; Wage Alerts</h3>
               </div>
               <button
                 onClick={() => setShowNotifications(false)}
@@ -126,7 +124,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <span className="material-symbols-outlined text-[18px] text-[#006c49] shrink-0 mt-0.5">account_balance</span>
                 <div>
                   <p className="font-semibold text-[#0b1c30]">Oakridge Payroll Synced</p>
-                  <p className="text-[#45464d] mt-0.5">Cycle progress updated: 17 days logged ($2,380.00 earned so far).</p>
+                  <p className="text-[#45464d] mt-0.5">Cycle progress updated: 17 days logged (₦238,000.00 earned so far).</p>
                   <span className="text-[10px] text-[#76777d] mt-1 block">Today at 8:00 AM</span>
                 </div>
               </div>
@@ -135,7 +133,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <span className="material-symbols-outlined text-[18px] text-[#008cc7] shrink-0 mt-0.5">school</span>
                 <div>
                   <p className="font-semibold text-[#0b1c30]">STEM Lab Match Available</p>
-                  <p className="text-[#45464d] mt-0.5">Claim up to $150 in science lab materials through Lopay Teacher Wellness.</p>
+                  <p className="text-[#45464d] mt-0.5">Claim up to ₦50,000 in science lab materials through Lopay Teacher Wellness.</p>
                   <span className="text-[10px] text-[#76777d] mt-1 block">Yesterday</span>
                 </div>
               </div>
@@ -174,40 +172,12 @@ export const Header: React.FC<HeaderProps> = ({
                 <h4 className="text-sm font-bold text-[#0b1c30] truncate">Sarah Jenkins, M.Ed</h4>
                 <p className="text-xs text-[#45464d] truncate">Grade 8 Science • Oakridge</p>
                 <span className="inline-flex items-center gap-1 text-[11px] text-[#006c49] font-semibold mt-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#006c49]"></span> Verified Faculty
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#006c49]"></span> Verified Faculty Member
                 </span>
               </div>
             </div>
 
             <div className="space-y-1">
-              <button
-                onClick={() => {
-                  setShowProfileMenu(false);
-                  onNavigate('onboarding-invite');
-                }}
-                className="w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-[#0b1c30] hover:bg-[#eff4ff] transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[18px] text-[#006c49]">badge</span>
-                  <span>View HR Synced Records</span>
-                </div>
-                <span className="text-[10px] text-[#006c49] bg-[#6cf8bb]/30 px-2 py-0.5 rounded-full">Onboarding view</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setShowProfileMenu(false);
-                  onNavigate('teachers');
-                }}
-                className="w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-[#0b1c30] hover:bg-[#eff4ff] transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[18px] text-[#006c49]">admin_panel_settings</span>
-                  <span>Oakridge Admin Portal</span>
-                </div>
-                <span className="text-[10px] text-[#45464d]">34 Staff</span>
-              </button>
-
               <button
                 onClick={() => {
                   setShowProfileMenu(false);
@@ -217,9 +187,24 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-[18px] text-[#76777d]">settings</span>
-                  <span>Account & Direct Deposit</span>
+                  <span>Account &amp; Direct Deposit</span>
                 </div>
               </button>
+
+              {onLogout && (
+                <button
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    onLogout();
+                  }}
+                  className="w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-[#ba1a1a] hover:bg-[#ffdad6]/40 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[18px]">logout</span>
+                    <span>Sign Out of Teacher Portal</span>
+                  </div>
+                </button>
+              )}
             </div>
           </div>
         </div>

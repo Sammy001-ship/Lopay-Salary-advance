@@ -1,3 +1,5 @@
+export type UserRole = 'school_owner' | 'teacher';
+
 export interface Teacher {
   id: string;
   name: string;
@@ -17,10 +19,41 @@ export interface Teacher {
   avatarUrl: string;
   invitedAt?: string;
   onboardedAt?: string;
+  schoolName?: string;
+  isSchoolRegistered?: boolean;
+}
+
+export interface RegisteredSchool {
+  id: string;
+  name: string;
+  location: string;
+  rcNumber: string;
+  isRegisteredWithLopay: boolean;
+  payrollCycleDay: number;
+  proprietorName: string;
+  facultyCount: number;
+}
+
+export interface SchoolOwner {
+  id: string;
+  name: string;
+  roleTitle: string;
+  email: string;
+  phone: string;
+  schoolName: string;
+  rcNumber: string;
+  payrollCycleDay: number;
+  totalFaculty: number;
+  monthlyPayrollBudget: number;
+  verified: boolean;
+  avatarUrl: string;
 }
 
 export interface AdvanceTransaction {
   id: string;
+  teacherId?: string;
+  teacherName?: string;
+  department?: string;
   amount: number;
   fee: number;
   netReceived: number;
@@ -43,4 +76,6 @@ export interface ActivityRecord {
   isPositive: boolean;
 }
 
-export type AppScreen = 'dashboard' | 'request-advance' | 'teachers' | 'advances' | 'settings' | 'onboarding-invite';
+export type TeacherScreen = 'dashboard' | 'request-advance' | 'advances' | 'settings';
+export type OwnerScreen = 'overview' | 'roster' | 'advances' | 'settings';
+export type AuthMode = 'login' | 'signup';

@@ -1,4 +1,82 @@
-import { Teacher, AdvanceTransaction, ActivityRecord } from '../types';
+import { Teacher, SchoolOwner, AdvanceTransaction, ActivityRecord, RegisteredSchool } from '../types';
+
+export const REGISTERED_SCHOOLS: RegisteredSchool[] = [
+  {
+    id: 'school-oakridge',
+    name: 'Oakridge International School',
+    location: 'Lekki Phase 1, Lagos',
+    rcNumber: 'RC-1849204',
+    isRegisteredWithLopay: true,
+    payrollCycleDay: 28,
+    proprietorName: 'Dr. Babatunde Adeyemi',
+    facultyCount: 34,
+  },
+  {
+    id: 'school-corona',
+    name: 'Corona Secondary School',
+    location: 'Agbara, Ogun State & Ikoyi, Lagos',
+    rcNumber: 'RC-1120485',
+    isRegisteredWithLopay: true,
+    payrollCycleDay: 25,
+    proprietorName: 'Mrs. Folasade Adefisayo',
+    facultyCount: 52,
+  },
+  {
+    id: 'school-grange',
+    name: 'Grange School Ikeja',
+    location: 'Harold Shodipo Crescent, GRA Ikeja, Lagos',
+    rcNumber: 'RC-2049182',
+    isRegisteredWithLopay: true,
+    payrollCycleDay: 27,
+    proprietorName: 'Mr. Ronald Cilliers',
+    facultyCount: 48,
+  },
+  {
+    id: 'school-atlantic',
+    name: 'Atlantic Hall Educational Trust',
+    location: 'Poka, Epe Expressway, Lagos',
+    rcNumber: 'RC-948271',
+    isRegisteredWithLopay: true,
+    payrollCycleDay: 28,
+    proprietorName: 'Chief (Mrs.) T. Taiwo',
+    facultyCount: 45,
+  },
+  {
+    id: 'school-greensprings',
+    name: 'Greensprings School',
+    location: 'Anthony & Lekki Campuses, Lagos',
+    rcNumber: 'RC-1309482',
+    isRegisteredWithLopay: true,
+    payrollCycleDay: 26,
+    proprietorName: 'Mrs. Lai Koiki',
+    facultyCount: 68,
+  },
+  {
+    id: 'school-meadow-hall',
+    name: 'Meadow Hall School',
+    location: 'Alma Beach Estate, Lekki, Lagos',
+    rcNumber: 'RC-1678234',
+    isRegisteredWithLopay: true,
+    payrollCycleDay: 28,
+    proprietorName: 'Mrs. Kehinde Nwani',
+    facultyCount: 39,
+  },
+];
+
+export const DEFAULT_SCHOOL_OWNER: SchoolOwner = {
+  id: 'owner-adeyemi',
+  name: 'Dr. Babatunde Adeyemi',
+  roleTitle: 'Proprietor & Governing Director',
+  email: 'director@oakridge.edu.ng',
+  phone: '+234 803 200 4910',
+  schoolName: 'Oakridge International School',
+  rcNumber: 'RC-1849204',
+  payrollCycleDay: 28,
+  totalFaculty: 34,
+  monthlyPayrollBudget: 14280000.0,
+  verified: true,
+  avatarUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDsrd8E2UkJkuzLRgovfQdcmIfL3Xe1wkNWCRbPigzvA07NDMVVXBKPdQNgijKCbAApVTvdkGtyuYUsxEL7Wx-VUfc_Vp997vsDwHJMFRnYsY50frX0dJhMZ7S9sqk60bQogwzIw9gJKI70OwSRR3Jn_W-IZuE27KXa1AKw4uFHYZrzRtu64OabnWSmnAlxUff_EZLSnuUMJyEM_g9N4WgT3mE7pEk6jTjU1ADIZA-VR6hxlGnRyvAz',
+};
 
 export const INITIAL_TEACHER: Teacher = {
   id: 'sarah-jenkins',

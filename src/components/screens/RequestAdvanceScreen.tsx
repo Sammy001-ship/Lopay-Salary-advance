@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { IMAGES } from '../../data/mockData';
-import { AdvanceTransaction, AppScreen } from '../../types';
+import { AdvanceTransaction, TeacherScreen } from '../../types';
 
 interface RequestAdvanceScreenProps {
   onBack: () => void;
-  onNavigate: (screen: AppScreen) => void;
+  onNavigate: (screen: TeacherScreen) => void;
   availableCap: number;
   onAdvanceCompleted: (newAdvance: AdvanceTransaction) => void;
 }
