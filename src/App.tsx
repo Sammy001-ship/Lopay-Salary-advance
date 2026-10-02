@@ -8,6 +8,7 @@ import { TeacherDirectoryScreen } from './components/screens/TeacherDirectoryScr
 import { InviteOnboardingScreen } from './components/screens/InviteOnboardingScreen';
 import { AdvancesActivityScreen } from './components/screens/AdvancesActivityScreen';
 import { SettingsScreen } from './components/screens/SettingsScreen';
+import { OwnerDashboardScreen } from './components/screens/OwnerDashboardScreen';
 import {
   INITIAL_COLLEAGUES,
   INITIAL_ACTIVITIES,
@@ -42,6 +43,20 @@ export default function App() {
 
   const handleAddTeacher = (newTeacher: Teacher) => {
     setTeachers((prev) => [newTeacher, ...prev]);
+  };
+
+  const handleApproveTeacher = (teacherId: string) => {
+    setTeachers((prev) =>
+      prev.map((teacher) =>
+        teacher.id === teacherId
+          ? {
+              ...teacher,
+              status: 'active',
+              onboardedAt: 'Approved today',
+            }
+          : teacher,
+      ),
+    );
   };
 
   const handleAdvanceCompleted = (newTx: AdvanceTransaction) => {
@@ -120,6 +135,15 @@ export default function App() {
                 teachers={teachers}
                 onAddTeacher={handleAddTeacher}
                 onNavigate={navigateTo}
+              />
+            )}
+
+            {currentScreen === 'owner-dashboard' && (
+              <OwnerDashboardScreen
+                teachers={teachers}
+                transactions={transactions}
+                onNavigate={navigateTo}
+                onApproveTeacher={handleApproveTeacher}
               />
             )}
 

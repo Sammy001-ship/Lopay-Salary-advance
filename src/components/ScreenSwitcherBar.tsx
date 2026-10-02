@@ -18,9 +18,10 @@ export const ScreenSwitcherBar: React.FC<ScreenSwitcherBarProps> = ({
     { id: 'dashboard', label: '1. Dashboard', icon: 'dashboard' },
     { id: 'request-advance', label: '2. Request Advance', icon: 'payments' },
     { id: 'teachers', label: '3. Add Teacher / Roster', icon: 'person_add' },
-    { id: 'onboarding-invite', label: '4. Invite Onboarding', icon: 'mark_email_read' },
-    { id: 'advances', label: '5. Activity Ledger', icon: 'receipt_long' },
-    { id: 'settings', label: '6. Settings', icon: 'settings' },
+    { id: 'owner-dashboard', label: '4. Owner Dashboard', icon: 'business' },
+    { id: 'onboarding-invite', label: '5. Invite Onboarding', icon: 'mark_email_read' },
+    { id: 'advances', label: '6. Activity Ledger', icon: 'receipt_long' },
+    { id: 'settings', label: '7. Settings', icon: 'settings' },
   ];
 
   return (

@@ -43,4 +43,4 @@ export interface ActivityRecord {
   isPositive: boolean;
 }
 
-export type AppScreen = 'dashboard' | 'request-advance' | 'teachers' | 'advances' | 'settings' | 'onboarding-invite';
+export type AppScreen = 'dashboard' | 'request-advance' | 'teachers' | 'owner-dashboard' | 'advances' | 'settings' | 'onboarding-invite';

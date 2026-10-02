@@ -28,6 +28,8 @@ export const Header: React.FC<HeaderProps> = ({
         return 'Request Advance';
       case 'teachers':
         return 'Teacher Directory';
+      case 'owner-dashboard':
+        return 'School Owner Dashboard';
       case 'advances':
         return 'Advance Activity';
       case 'settings':
@@ -197,15 +199,29 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={() => {
                   setShowProfileMenu(false);
-                  onNavigate('teachers');
+                  onNavigate('owner-dashboard');
                 }}
                 className="w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-[#0b1c30] hover:bg-[#eff4ff] transition-colors"
               >
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-[18px] text-[#006c49]">admin_panel_settings</span>
-                  <span>Oakridge Admin Portal</span>
+                  <span>School Owner Dashboard</span>
                 </div>
                 <span className="text-[10px] text-[#45464d]">34 Staff</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowProfileMenu(false);
+                  onNavigate('teachers');
+                }}
+                className="w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-[#0b1c30] hover:bg-[#eff4ff] transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px] text-[#006c49]">groups</span>
+                  <span>Teacher Directory</span>
+                </div>
+                <span className="text-[10px] text-[#45464d]">Roster</span>
               </button>
 
               <button

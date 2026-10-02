@@ -24,6 +24,11 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentScreen, onNavigate 
       icon: 'school',
     },
     {
+      screen: 'owner-dashboard' as AppScreen,
+      label: 'School',
+      icon: 'business',
+    },
+    {
       screen: 'settings' as AppScreen,
       label: 'Settings',
       icon: 'manage_accounts',
