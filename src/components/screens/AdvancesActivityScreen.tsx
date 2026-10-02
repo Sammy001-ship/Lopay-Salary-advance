@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { AdvanceTransaction, ActivityRecord, AppScreen } from '../../types';
+import { AdvanceTransaction, ActivityRecord, TeacherScreen } from '../../types';
 
 interface AdvancesActivityScreenProps {
   transactions: AdvanceTransaction[];
   activities: ActivityRecord[];
-  onNavigate: (screen: AppScreen) => void;
+  onNavigate: (screen: TeacherScreen) => void;
 }
 
 export const AdvancesActivityScreen: React.FC<AdvancesActivityScreenProps> = ({

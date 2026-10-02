@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { IMAGES } from '../../data/mockData';
-import { ActivityRecord, AdvanceTransaction, AppScreen } from '../../types';
+import { ActivityRecord, AdvanceTransaction, TeacherScreen } from '../../types';
 
 interface DashboardScreenProps {
-  onNavigate: (screen: AppScreen) => void;
+  onNavigate: (screen: TeacherScreen) => void;
   activities: ActivityRecord[];
   activeAdvances: AdvanceTransaction[];
   availableAmount: number;

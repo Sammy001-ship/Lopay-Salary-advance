@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { IMAGES } from '../../data/mockData';
-import { AppScreen } from '../../types';
+import { TeacherScreen } from '../../types';
 
 interface SettingsScreenProps {
-  onNavigate: (screen: AppScreen) => void;
+  onNavigate: (screen: TeacherScreen) => void;
+  onLogout?: () => void;
 }
 
-export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
+export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onLogout }) => {
   const [smsEnabled, setSmsEnabled] = useState<boolean>(true);
   const [emailReceipts, setEmailReceipts] = useState<boolean>(true);
   const [autoSaveEnabled, setAutoSaveEnabled] = useState<boolean>(false);
@@ -44,13 +45,10 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) =>
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => onNavigate('onboarding-invite')}
-          className="text-xs font-semibold text-[#006c49] bg-[#eff4ff] hover:bg-[#dce9ff] px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
-        >
-          View Badge
-        </button>
+        <div className="flex items-center gap-1.5 px-3 py-1 bg-[#6cf8bb]/30 rounded-xl">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#006c49]"></span>
+          <span className="text-xs font-semibold text-[#00714d]">Verified</span>
+        </div>
       </div>
 
       {/* Payroll Sync Status */}
@@ -181,6 +179,18 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) =>
           </div>
         ))}
       </div>
+
+      {/* Logout Action */}
+      {onLogout && (
+        <button
+          type="button"
+          onClick={onLogout}
+          className="w-full py-3 bg-[#ffdad6] hover:bg-[#ffdad6]/80 text-[#ba1a1a] font-bold text-xs rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+        >
+          <span className="material-symbols-outlined text-[18px]">logout</span>
+          <span>Sign Out of Teacher Portal</span>
+        </button>
+      )}
     </div>
   );
 };

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { IMAGES } from '../../data/mockData';
-import { Teacher, AppScreen } from '../../types';
+import { Teacher } from '../../types';
 
 interface TeacherDirectoryScreenProps {
   teachers: Teacher[];
   onAddTeacher: (teacher: Teacher) => void;
-  onNavigate: (screen: AppScreen) => void;
+  onNavigate?: (screen: string) => void;
 }
 
 export const TeacherDirectoryScreen: React.FC<TeacherDirectoryScreenProps> = ({
@@ -409,7 +409,7 @@ export const TeacherDirectoryScreen: React.FC<TeacherDirectoryScreenProps> = ({
           </div>
           <button
             type="button"
-            onClick={() => onNavigate('onboarding-invite')}
+            onClick={() => onNavigate?.('onboarding-invite')}
             className="text-[12px] font-semibold text-[#006c49] hover:underline cursor-pointer"
           >
             Preview Onboarding
