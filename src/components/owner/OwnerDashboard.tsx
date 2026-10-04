@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { IMAGES } from '../../data/mockData';
-import { SchoolOwner, Teacher, AdvanceTransaction, OwnerScreen } from '../../types';
+import { IMAGES, REGISTERED_SCHOOLS } from '../../data/mockData';
+import { SchoolOwner, Teacher, AdvanceTransaction, OwnerScreen, RegisteredSchool } from '../../types';
 import { TeacherDirectoryScreen } from '../screens/TeacherDirectoryScreen';
 import { LopayLogoMark } from '../common/LopayLogo';
 import { AdvanceRequestsMonitor } from './AdvanceRequestsMonitor';
+import { RegisteredSchoolsDirectory } from './RegisteredSchoolsDirectory';
 
 interface OwnerDashboardProps {
   owner: SchoolOwner;
@@ -29,6 +30,47 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
   const [payrollCycleDay, setPayrollCycleDay] = useState<number>(owner.payrollCycleDay || 28);
   const [payrollUpdateSaved, setPayrollUpdateSaved] = useState<boolean>(false);
 
+  // Registered Schools state with localStorage persistence
+  const [schoolsList, setSchoolsList] = useState<RegisteredSchool[]>(() => {
+    try {
+      const saved = localStorage.getItem('lopay_registered_schools');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch {
+      // fallback
+    }
+    return REGISTERED_SCHOOLS;
+  });
+
+  // Active selected school (defaults to owner's school or first school in list)
+  const [activeSchool, setActiveSchool] = useState<RegisteredSchool>(() => {
+    const defaultSchool = schoolsList.find((s) => s.name === owner.schoolName) || schoolsList[0];
+    return defaultSchool;
+  });
+
+  const handleSelectSchool = (school: RegisteredSchool, targetTab?: OwnerScreen) => {
+    setActiveSchool(school);
+    setPayrollCycleDay(school.payrollCycleDay || 28);
+    if (targetTab) {
+      setCurrentTab(targetTab);
+    }
+  };
+
+  const handleAddSchool = (newSchool: RegisteredSchool) => {
+    setSchoolsList((prev) => {
+      const updated = [newSchool, ...prev];
+      try {
+        localStorage.setItem('lopay_registered_schools', JSON.stringify(updated));
+      } catch {
+        // ignore
+      }
+      return updated;
+    });
+    // Set newly created school as active
+    setActiveSchool(newSchool);
+  };
+
   const handleUpdatePayrollDay = (newDay: number) => {
     setPayrollCycleDay(newDay);
     setPayrollUpdateSaved(true);
@@ -52,13 +94,22 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">
             <LopayLogoMark size={28} color="#0b1c30" accentColor="#ffffff" />
-            <div className="flex flex-col min-w-0">
-              <span className="text-[13px] font-bold text-[#0b1c30] truncate">
-                {owner.schoolName}
-              </span>
+            <div
+              className="flex flex-col min-w-0 cursor-pointer group"
+              onClick={() => setCurrentTab('schools')}
+              title="Click to view or switch schools"
+            >
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="text-[13px] font-bold text-[#0b1c30] truncate group-hover:text-[#006c49] transition-colors">
+                  {activeSchool.name}
+                </span>
+                <span className="material-symbols-outlined text-[14px] text-[#76777d] group-hover:text-[#006c49] transition-colors">
+                  unfold_more
+                </span>
+              </div>
               <span className="text-[10px] text-[#006c49] font-bold flex items-center gap-1 leading-none mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#006c49]"></span>
-                LOPAY Admin
+                {activeSchool.rcNumber} • LOPAY Admin
               </span>
             </div>
           </div>
@@ -140,20 +191,22 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
               <div className="absolute -right-10 -bottom-10 w-36 h-36 rounded-full bg-[#006c49]/30 blur-2xl"></div>
 
               <div className="flex items-center justify-between text-[#7c839b] text-[11px] font-semibold uppercase tracking-wider">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#6ffbbe]"></span>
-                  <span>{owner.schoolName}</span>
+                <span className="flex items-center gap-1.5 min-w-0">
+                  <span className="w-2 h-2 rounded-full bg-[#6ffbbe] shrink-0"></span>
+                  <span className="truncate font-bold text-white">{activeSchool.name}</span>
                 </span>
-                <span className="bg-[#6cf8bb]/20 text-[#6ffbbe] px-2.5 py-0.5 rounded-full font-bold">
-                  {owner.rcNumber}
+                <span className="bg-[#6cf8bb]/20 text-[#6ffbbe] px-2.5 py-0.5 rounded-full font-bold shrink-0">
+                  {activeSchool.rcNumber}
                 </span>
               </div>
 
               <div className="mt-3">
                 <h2 className="text-[22px] font-bold text-white tracking-tight">
-                  {owner.name}
+                  {activeSchool.proprietorName}
                 </h2>
-                <p className="text-xs text-[#d3e4fe] mt-0.5">{owner.roleTitle}</p>
+                <p className="text-xs text-[#d3e4fe] mt-0.5">
+                  Proprietor &amp; Governing Director • {activeSchool.location}
+                </p>
               </div>
 
               {/* 3 Metrics Grid */}
@@ -161,50 +214,142 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                 <div className="p-3 bg-[#d3e4fe]/10 rounded-xl">
                   <span className="text-[11px] text-[#7c839b] block">Monthly Payroll Pool</span>
                   <span className="text-[18px] font-bold text-white tabular-nums block mt-0.5">
-                    ₦{estimatedPayroll.toLocaleString('en-NG', { minimumFractionDigits: 2 })}
+                    ₦{(activeSchool.monthlyPayrollBudget || estimatedPayroll).toLocaleString('en-NG', { minimumFractionDigits: 2 })}
                   </span>
-                  <span className="text-[10px] text-[#6ffbbe] mt-0.5 block">28th Monthly Cycle</span>
+                  <span className="text-[10px] text-[#6ffbbe] mt-0.5 block">{activeSchool.payrollCycleDay}th Monthly Cycle</span>
                 </div>
 
                 <div className="p-3 bg-[#006c49]/30 border border-[#6cf8bb]/20 rounded-xl">
                   <span className="text-[11px] text-[#6ffbbe] block">Faculty Advances This Month</span>
                   <span className="text-[18px] font-bold text-white tabular-nums block mt-0.5">
-                    ₦{totalAdvancesSum.toLocaleString('en-NG', { minimumFractionDigits: 2 })}
+                    ₦{(activeSchool.advancesThisMonth || totalAdvancesSum).toLocaleString('en-NG', { minimumFractionDigits: 2 })}
                   </span>
-                  <span className="text-[10px] text-[#7c839b] mt-0.5 block">Zero employer liability</span>
+                  <span className="text-[10px] text-[#7c839b] mt-0.5 block">{activeSchool.facultyCount} active faculty</span>
                 </div>
               </div>
             </div>
 
             {/* Quick Action Buttons */}
-            <div className="grid grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => setCurrentTab('schools')}
+                className="p-3 bg-white rounded-2xl shadow-xs border border-[#eff4ff] flex flex-col items-start gap-2 hover:bg-[#eff4ff] transition-colors cursor-pointer text-left group"
+              >
+                <div className="w-8 h-8 rounded-xl bg-[#6cf8bb]/30 text-[#006c49] flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[18px]">domain</span>
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-[#0b1c30] block group-hover:text-[#006c49] transition-colors">
+                    Schools ({schoolsList.length})
+                  </span>
+                  <span className="text-[10px] text-[#45464d] block">All Institutions</span>
+                </div>
+              </button>
+
               <button
                 type="button"
                 onClick={() => setCurrentTab('roster')}
-                className="p-3.5 bg-white rounded-2xl shadow-xs border border-[#eff4ff] flex items-center gap-3 hover:bg-[#eff4ff] transition-colors cursor-pointer text-left"
+                className="p-3 bg-white rounded-2xl shadow-xs border border-[#eff4ff] flex flex-col items-start gap-2 hover:bg-[#eff4ff] transition-colors cursor-pointer text-left group"
               >
-                <div className="w-10 h-10 rounded-xl bg-[#6cf8bb]/30 text-[#006c49] flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-[22px]">person_add</span>
+                <div className="w-8 h-8 rounded-xl bg-[#dce9ff] text-[#008cc7] flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[18px]">person_add</span>
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-[#0b1c30] block">Add New Teacher</span>
-                  <span className="text-[11px] text-[#45464d] block">SMS &amp; Email invite</span>
+                  <span className="text-xs font-bold text-[#0b1c30] block group-hover:text-[#008cc7] transition-colors">
+                    Add Teacher
+                  </span>
+                  <span className="text-[10px] text-[#45464d] block">SMS &amp; Email</span>
                 </div>
               </button>
 
               <button
                 type="button"
                 onClick={handleExportCsv}
-                className="p-3.5 bg-white rounded-2xl shadow-xs border border-[#eff4ff] flex items-center gap-3 hover:bg-[#eff4ff] transition-colors cursor-pointer text-left"
+                className="p-3 bg-white rounded-2xl shadow-xs border border-[#eff4ff] flex flex-col items-start gap-2 hover:bg-[#eff4ff] transition-colors cursor-pointer text-left group"
               >
-                <div className="w-10 h-10 rounded-xl bg-[#dce9ff] text-[#008cc7] flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-[22px]">file_download</span>
+                <div className="w-8 h-8 rounded-xl bg-[#eff4ff] text-[#45464d] flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-[18px]">file_download</span>
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-[#0b1c30] block">Export Deductions</span>
-                  <span className="text-[11px] text-[#45464d] block">March 28 pay sheet</span>
+                  <span className="text-xs font-bold text-[#0b1c30] block">
+                    Export Pay
+                  </span>
+                  <span className="text-[10px] text-[#45464d] block">CSV Ledger</span>
                 </div>
               </button>
+            </div>
+
+            {/* Registered Schools Live Network Snippet */}
+            <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-[#eff4ff] space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-[#eff4ff] text-[#006c49] flex items-center justify-center">
+                    <span className="material-symbols-outlined text-[18px]">domain</span>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[#0b1c30]">Registered Schools Network</h3>
+                    <p className="text-[11px] text-[#45464d]">{schoolsList.length} accredited institutions registered on Lopay</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCurrentTab('schools')}
+                  className="text-xs text-[#006c49] font-bold hover:underline flex items-center gap-0.5"
+                >
+                  <span>View All ({schoolsList.length})</span>
+                  <span className="material-symbols-outlined text-[15px]">chevron_right</span>
+                </button>
+              </div>
+
+              {/* Quick Schools Pills/Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                {schoolsList.slice(0, 4).map((school) => {
+                  const isCurrent = activeSchool.id === school.id;
+                  return (
+                    <div
+                      key={school.id}
+                      onClick={() => handleSelectSchool(school, 'overview')}
+                      className={`p-2.5 rounded-xl flex items-center justify-between cursor-pointer transition-all ${
+                        isCurrent
+                          ? 'bg-[#006c49]/15 border-2 border-[#006c49] shadow-xs'
+                          : 'bg-[#eff4ff] hover:bg-[#dce9ff] border border-transparent'
+                      }`}
+                      title={`Click to view ${school.name}`}
+                    >
+                      <div className="min-w-0 pr-2">
+                        <div className="flex items-center gap-1">
+                          <p className="text-xs font-bold text-[#0b1c30] truncate">{school.name}</p>
+                          {isCurrent && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#006c49] shrink-0"></span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-[#45464d] truncate mt-0.5">
+                          {school.location.split(',')[0]} • Cycle: {school.payrollCycleDay}th
+                        </p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className="text-[11px] font-bold text-[#006c49] block">
+                          {school.facultyCount} Faculty
+                        </span>
+                        <span className="text-[9px] bg-[#6cf8bb]/40 text-[#00714d] font-semibold px-1.5 py-0.2 rounded-full inline-block mt-0.5">
+                          {isCurrent ? 'Viewing' : 'Select'}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {schoolsList.length > 4 && (
+                <button
+                  type="button"
+                  onClick={() => setCurrentTab('schools')}
+                  className="w-full py-2 bg-[#f8f9ff] hover:bg-[#eff4ff] text-[#006c49] text-xs font-semibold rounded-xl text-center transition-colors cursor-pointer border border-[#d3e4fe]/50"
+                >
+                  + {schoolsList.length - 4} more schools registered • Open Schools Directory
+                </button>
+              )}
             </div>
 
             {/* Faculty Earned-Wage Claims Queue Snippet */}
@@ -278,11 +423,25 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
           </div>
         )}
 
+        {/* 1b. SCHOOLS DIRECTORY SCREEN */}
+        {currentTab === 'schools' && (
+          <RegisteredSchoolsDirectory
+            schools={schoolsList}
+            activeSchoolId={activeSchool.id}
+            onAddSchool={handleAddSchool}
+            onSelectSchool={(school, targetTab) => handleSelectSchool(school, targetTab)}
+          />
+        )}
+
         {/* 2. ROSTER & PROVISIONING SCREEN (Matching Image 3) */}
         {currentTab === 'roster' && (
           <TeacherDirectoryScreen
             teachers={teachers}
             onAddTeacher={onAddTeacher}
+            schoolName={activeSchool.name}
+            rcNumber={activeSchool.rcNumber}
+            facultyCount={activeSchool.facultyCount}
+            payrollCycleDay={activeSchool.payrollCycleDay}
             onNavigate={(screen) => {
               if (screen === 'onboarding-invite') {
                 setCurrentTab('roster');
@@ -438,57 +597,71 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
 
       {/* Owner Bottom Tab Bar */}
       <nav className="fixed bottom-0 w-full z-40 pb-[env(safe-area-inset-bottom,0px)] bg-[#f8f9ff]/90 backdrop-blur-xl border-t border-[#d3e4fe]/50 shadow-md">
-        <div className="max-w-lg mx-auto flex items-center justify-around h-16 px-2">
+        <div className="max-w-lg mx-auto flex items-center justify-around h-16 px-1">
           <button
             type="button"
             onClick={() => setCurrentTab('overview')}
-            className={`flex flex-col items-center justify-center gap-0.5 min-w-[64px] h-12 transition-colors cursor-pointer ${
+            className={`flex flex-col items-center justify-center gap-0.5 min-w-[54px] h-12 transition-colors cursor-pointer ${
               currentTab === 'overview' ? 'text-[#006c49] font-bold' : 'text-[#45464d]'
             }`}
           >
             <span className={`material-symbols-outlined text-[22px] ${currentTab === 'overview' ? 'fill' : ''}`}>
               dashboard
             </span>
-            <span className="text-[11px]">Overview</span>
+            <span className="text-[10px]">Overview</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setCurrentTab('schools')}
+            className={`relative flex flex-col items-center justify-center gap-0.5 min-w-[54px] h-12 transition-colors cursor-pointer ${
+              currentTab === 'schools' ? 'text-[#006c49] font-bold' : 'text-[#45464d]'
+            }`}
+          >
+            <span className={`material-symbols-outlined text-[22px] ${currentTab === 'schools' ? 'fill' : ''}`}>
+              domain
+            </span>
+            <span className="text-[10px]">Schools</span>
+            <span className="absolute top-1.5 right-2 w-1.5 h-1.5 rounded-full bg-[#006c49]"></span>
           </button>
 
           <button
             type="button"
             onClick={() => setCurrentTab('roster')}
-            className={`flex flex-col items-center justify-center gap-0.5 min-w-[64px] h-12 transition-colors cursor-pointer ${
+            className={`flex flex-col items-center justify-center gap-0.5 min-w-[54px] h-12 transition-colors cursor-pointer ${
               currentTab === 'roster' ? 'text-[#006c49] font-bold' : 'text-[#45464d]'
             }`}
           >
             <span className={`material-symbols-outlined text-[22px] ${currentTab === 'roster' ? 'fill' : ''}`}>
               groups
             </span>
-            <span className="text-[11px]">Faculty</span>
+            <span className="text-[10px]">Faculty</span>
           </button>
 
           <button
             type="button"
             onClick={() => setCurrentTab('advances')}
-            className={`relative flex flex-col items-center justify-center gap-0.5 min-w-[64px] h-12 transition-colors cursor-pointer ${
+            className={`relative flex flex-col items-center justify-center gap-0.5 min-w-[54px] h-12 transition-colors cursor-pointer ${
               currentTab === 'advances' ? 'text-[#006c49] font-bold' : 'text-[#45464d]'
             }`}
           >
             <span className={`material-symbols-outlined text-[22px] ${currentTab === 'advances' ? 'fill' : ''}`}>
               monitoring
             </span>
-            <span className="text-[10px] leading-tight">Advances &amp; Fees</span>
+            <span className="text-[10px] leading-tight">Advances</span>
           </button>
 
           <button
             type="button"
             onClick={() => setCurrentTab('settings')}
-            className={`flex flex-col items-center justify-center gap-0.5 min-w-[64px] h-12 transition-colors cursor-pointer ${
+            className={`flex flex-col items-center justify-center gap-0.5 min-w-[54px] h-12 transition-colors cursor-pointer ${
               currentTab === 'settings' ? 'text-[#006c49] font-bold' : 'text-[#45464d]'
             }`}
           >
             <span className={`material-symbols-outlined text-[22px] ${currentTab === 'settings' ? 'fill' : ''}`}>
               settings
             </span>
-            <span className="text-[11px]">Settings</span>
+            <span className="text-[10px]">Settings</span>
           </button>
         </div>
       </nav>

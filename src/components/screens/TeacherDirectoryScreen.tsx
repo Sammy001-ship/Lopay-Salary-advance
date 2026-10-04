@@ -6,12 +6,20 @@ interface TeacherDirectoryScreenProps {
   teachers: Teacher[];
   onAddTeacher: (teacher: Teacher) => void;
   onNavigate?: (screen: string) => void;
+  schoolName?: string;
+  facultyCount?: number;
+  payrollCycleDay?: number;
+  rcNumber?: string;
 }
 
 export const TeacherDirectoryScreen: React.FC<TeacherDirectoryScreenProps> = ({
   teachers,
   onAddTeacher,
   onNavigate,
+  schoolName = 'Oakridge International School',
+  facultyCount = 34,
+  payrollCycleDay = 28,
+  rcNumber = 'RC-1849204',
 }) => {
   // Form State
   const [fullName, setFullName] = useState<string>('Sarah Jenkins, M.Ed');
@@ -100,10 +108,10 @@ export const TeacherDirectoryScreen: React.FC<TeacherDirectoryScreenProps> = ({
 
           <div className="mt-1">
             <h2 className="text-[20px] font-bold text-[#0b1c30] tracking-tight">
-              Oakridge International School
+              {schoolName}
             </h2>
             <p className="text-[13px] text-[#45464d]">
-              Admin roster &amp; salary advance provisioning
+              Admin roster &amp; salary advance provisioning • {rcNumber}
             </p>
           </div>
 
@@ -115,7 +123,7 @@ export const TeacherDirectoryScreen: React.FC<TeacherDirectoryScreenProps> = ({
               <div className="flex flex-col min-w-0">
                 <span className="text-[11px] text-[#45464d] leading-none">Roster</span>
                 <span className="text-[13px] font-bold text-[#0b1c30] truncate mt-0.5">
-                  34 Active Staff
+                  {facultyCount} Active Staff
                 </span>
               </div>
             </div>
@@ -127,7 +135,7 @@ export const TeacherDirectoryScreen: React.FC<TeacherDirectoryScreenProps> = ({
               <div className="flex flex-col min-w-0">
                 <span className="text-[11px] text-[#45464d] leading-none">Payroll Cycle</span>
                 <span className="text-[13px] font-bold text-[#0b1c30] truncate mt-0.5">
-                  28th Monthly
+                  {payrollCycleDay}th Monthly
                 </span>
               </div>
             </div>

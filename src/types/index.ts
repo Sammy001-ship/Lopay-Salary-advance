@@ -32,6 +32,12 @@ export interface RegisteredSchool {
   payrollCycleDay: number;
   proprietorName: string;
   facultyCount: number;
+  monthlyPayrollBudget?: number;
+  contactEmail?: string;
+  contactPhone?: string;
+  joinedDate?: string;
+  advancesThisMonth?: number;
+  advancesCount?: number;
 }
 
 export interface SchoolOwner {
@@ -78,5 +84,5 @@ export interface ActivityRecord {
 
 export type AppScreen = 'dashboard' | 'request-advance' | 'teachers' | 'owner-dashboard' | 'advances' | 'settings' | 'onboarding-invite';
 export type TeacherScreen = 'dashboard' | 'request-advance' | 'advances' | 'settings';
-export type OwnerScreen = 'overview' | 'roster' | 'advances' | 'settings';
+export type OwnerScreen = 'overview' | 'schools' | 'roster' | 'advances' | 'settings';
 export type AuthMode = 'login' | 'signup';
