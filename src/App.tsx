@@ -216,6 +216,7 @@ export default function App() {
                 transactions={transactions}
                 onAddTeacher={handleAddTeacher}
                 onLogout={handleOwnerLogout}
+                onSwitchToTeacher={() => handleSelectPortal('teacher')}
               />
             </div>
           )}

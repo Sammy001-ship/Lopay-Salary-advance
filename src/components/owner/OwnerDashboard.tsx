@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { IMAGES } from '../../data/mockData';
 import { SchoolOwner, Teacher, AdvanceTransaction, OwnerScreen } from '../../types';
 import { TeacherDirectoryScreen } from '../screens/TeacherDirectoryScreen';
+import { LopayLogoMark } from '../common/LopayLogo';
+import { AdvanceRequestsMonitor } from './AdvanceRequestsMonitor';
 
 interface OwnerDashboardProps {
   owner: SchoolOwner;
@@ -9,6 +11,7 @@ interface OwnerDashboardProps {
   transactions: AdvanceTransaction[];
   onAddTeacher: (teacher: Teacher) => void;
   onLogout: () => void;
+  onSwitchToTeacher?: () => void;
 }
 
 export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
@@ -17,10 +20,20 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
   transactions,
   onAddTeacher,
   onLogout,
+  onSwitchToTeacher,
 }) => {
   const [currentTab, setCurrentTab] = useState<OwnerScreen>('overview');
+  const [advancesViewMode, setAdvancesViewMode] = useState<'monitor' | 'ledger'>('monitor');
   const [showNotifications, setShowNotifications] = useState<boolean>(false);
   const [downloadNotice, setDownloadNotice] = useState<string | null>(null);
+  const [payrollCycleDay, setPayrollCycleDay] = useState<number>(owner.payrollCycleDay || 28);
+  const [payrollUpdateSaved, setPayrollUpdateSaved] = useState<boolean>(false);
+
+  const handleUpdatePayrollDay = (newDay: number) => {
+    setPayrollCycleDay(newDay);
+    setPayrollUpdateSaved(true);
+    setTimeout(() => setPayrollUpdateSaved(false), 2500);
+  };
 
   // Calculate school-wide metrics
   const activeStaffCount = teachers.filter((t) => t.status === 'active').length + 32; // base 34+
@@ -38,14 +51,14 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
       <header className="sticky top-0 z-30 bg-[#f8f9ff]/90 backdrop-blur-md border-b border-[#d3e4fe]/50 px-4 py-3">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">
-            <img alt="Lopay Logo" src={IMAGES.logo} className="h-7 w-auto object-contain" />
+            <LopayLogoMark size={28} color="#0b1c30" accentColor="#ffffff" />
             <div className="flex flex-col min-w-0">
               <span className="text-[13px] font-bold text-[#0b1c30] truncate">
                 {owner.schoolName}
               </span>
-              <span className="text-[11px] text-[#006c49] font-semibold flex items-center gap-1 leading-none">
+              <span className="text-[10px] text-[#006c49] font-bold flex items-center gap-1 leading-none mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#006c49]"></span>
-                School Admin Portal
+                LOPAY Admin
               </span>
             </div>
           </div>
@@ -281,61 +294,89 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
         {/* 3. ADVANCES QUEUE & AUDIT LEDGER */}
         {currentTab === 'advances' && (
           <div className="space-y-4 animate-in fade-in">
-            <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-[#eff4ff] space-y-3">
-              <div className="flex items-center justify-between pb-2 border-b border-[#eff4ff]">
-                <div>
-                  <h3 className="text-sm font-bold text-[#0b1c30]">All Faculty Advance Claims</h3>
-                  <p className="text-[11px] text-[#45464d]">Oakridge School Payroll Reconciliation</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleExportCsv}
-                  className="px-2.5 py-1 bg-[#eff4ff] hover:bg-[#dce9ff] text-[#006c49] text-xs font-bold rounded-lg transition-colors flex items-center gap-1"
-                >
-                  <span className="material-symbols-outlined text-[15px]">download</span>
-                  <span>CSV</span>
-                </button>
-              </div>
+            {/* View Sub-Switcher */}
+            <div className="flex items-center justify-between bg-white p-1.5 rounded-2xl border border-[#eff4ff] shadow-xs">
+              <button
+                type="button"
+                onClick={() => setAdvancesViewMode('monitor')}
+                className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                  advancesViewMode === 'monitor'
+                    ? 'bg-[#006c49] text-white shadow-xs'
+                    : 'text-[#45464d] hover:bg-[#eff4ff]'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[16px]">pie_chart</span>
+                <span>User Sections &amp; Delivery Fee Monitor</span>
+              </button>
 
-              <div className="space-y-2.5">
-                {transactions.map((tx) => (
-                  <div
-                    key={tx.id}
-                    className="p-3 bg-[#eff4ff] rounded-xl flex items-center justify-between gap-2"
-                  >
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-[#0b1c30]">Sarah Jenkins, M.Ed</p>
-                      <p className="text-[11px] text-[#45464d]">{tx.purpose} • {tx.requestedAt}</p>
-                      <span className="text-[10px] text-[#76777d] font-mono">{tx.referenceNumber}</span>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <span className="text-xs font-bold text-[#006c49] block tabular-nums">
-                        ₦{tx.amount.toLocaleString('en-NG', { minimumFractionDigits: 2 })}
-                      </span>
-                      <span className="text-[10px] bg-[#6cf8bb]/40 text-[#00714d] font-semibold px-2 py-0.5 rounded-full inline-block mt-0.5">
-                        {tx.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-
-                <div className="p-3 bg-[#eff4ff] rounded-xl flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold text-[#0b1c30]">Elena Rostova</p>
-                    <p className="text-[11px] text-[#45464d]">Emergency medical • Yesterday</p>
-                    <span className="text-[10px] text-[#76777d] font-mono">LP-4829104</span>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <span className="text-xs font-bold text-[#006c49] block tabular-nums">
-                      ₦30,000.00
-                    </span>
-                    <span className="text-[10px] bg-[#6cf8bb]/40 text-[#00714d] font-semibold px-2 py-0.5 rounded-full inline-block mt-0.5">
-                      completed
-                    </span>
-                  </div>
-                </div>
-              </div>
+              <button
+                type="button"
+                onClick={() => setAdvancesViewMode('ledger')}
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                  advancesViewMode === 'ledger'
+                    ? 'bg-[#006c49] text-white shadow-xs'
+                    : 'text-[#45464d] hover:bg-[#eff4ff]'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[16px]">table_rows</span>
+                <span>Raw Ledger</span>
+              </button>
             </div>
+
+            {/* View 1: User Section & Delivery Fee Monitor */}
+            {advancesViewMode === 'monitor' && (
+              <AdvanceRequestsMonitor
+                teachers={teachers}
+                transactions={transactions}
+                onExportSchedule={handleExportCsv}
+              />
+            )}
+
+            {/* View 2: Raw Settlement Ledger */}
+            {advancesViewMode === 'ledger' && (
+              <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-xs border border-[#eff4ff] space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-[#eff4ff]">
+                  <div>
+                    <h3 className="text-sm font-bold text-[#0b1c30]">All Faculty Advance Claims</h3>
+                    <p className="text-[11px] text-[#45464d]">Oakridge School Payroll Reconciliation</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleExportCsv}
+                    className="px-2.5 py-1 bg-[#eff4ff] hover:bg-[#dce9ff] text-[#006c49] text-xs font-bold rounded-lg transition-colors flex items-center gap-1"
+                  >
+                    <span className="material-symbols-outlined text-[15px]">download</span>
+                    <span>CSV</span>
+                  </button>
+                </div>
+
+                <div className="space-y-2.5">
+                  {transactions.map((tx) => (
+                    <div
+                      key={tx.id}
+                      className="p-3 bg-[#eff4ff] rounded-xl flex items-center justify-between gap-2"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-[#0b1c30]">{tx.teacherName || 'Faculty Member'}</p>
+                        <p className="text-[11px] text-[#45464d]">{tx.purpose} • {tx.requestedAt}</p>
+                        <span className="text-[10px] text-[#76777d] font-mono">{tx.referenceNumber}</span>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className="text-xs font-bold text-[#006c49] block tabular-nums">
+                          ₦{tx.amount.toLocaleString('en-NG', { minimumFractionDigits: 2 })}
+                        </span>
+                        <span className="text-[10px] text-[#76777d] block">
+                          Fee: ₦{(tx.fee || 500).toLocaleString('en-NG')}
+                        </span>
+                        <span className="text-[10px] bg-[#6cf8bb]/40 text-[#00714d] font-semibold px-2 py-0.5 rounded-full inline-block mt-0.5">
+                          {tx.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -354,9 +395,26 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                   <span className="text-[#45464d]">CAC / RC Number:</span>
                   <span className="font-semibold text-[#0b1c30]">{owner.rcNumber}</span>
                 </div>
-                <div className="flex justify-between p-2.5 bg-[#eff4ff] rounded-xl">
-                  <span className="text-[#45464d]">Payroll Cycle Day:</span>
-                  <span className="font-semibold text-[#0b1c30]">{owner.payrollCycleDay}th of every month</span>
+                <div className="flex items-center justify-between p-2.5 bg-[#eff4ff] rounded-xl">
+                  <div className="flex flex-col">
+                    <span className="text-[#45464d]">Payroll Date:</span>
+                    {payrollUpdateSaved && (
+                      <span className="text-[10px] text-[#006c49] font-bold">Saved successfully!</span>
+                    )}
+                  </div>
+                  <select
+                    value={payrollCycleDay}
+                    onChange={(e) => handleUpdatePayrollDay(Number(e.target.value))}
+                    className="bg-white text-[#0b1c30] font-semibold text-xs py-1 px-2.5 rounded-lg border border-[#d3e4fe] focus:outline-hidden focus:ring-2 focus:ring-[#006c49] cursor-pointer"
+                  >
+                    <option value={25}>25th Monthly</option>
+                    <option value={26}>26th Monthly</option>
+                    <option value={27}>27th Monthly</option>
+                    <option value={28}>28th Monthly</option>
+                    <option value={29}>29th Monthly</option>
+                    <option value={30}>30th Monthly</option>
+                    <option value={31}>31st Monthly (Month-End)</option>
+                  </select>
                 </div>
                 <div className="flex justify-between p-2.5 bg-[#eff4ff] rounded-xl">
                   <span className="text-[#45464d]">Admin Contact:</span>
@@ -410,14 +468,14 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
           <button
             type="button"
             onClick={() => setCurrentTab('advances')}
-            className={`flex flex-col items-center justify-center gap-0.5 min-w-[64px] h-12 transition-colors cursor-pointer ${
+            className={`relative flex flex-col items-center justify-center gap-0.5 min-w-[64px] h-12 transition-colors cursor-pointer ${
               currentTab === 'advances' ? 'text-[#006c49] font-bold' : 'text-[#45464d]'
             }`}
           >
             <span className={`material-symbols-outlined text-[22px] ${currentTab === 'advances' ? 'fill' : ''}`}>
-              payments
+              monitoring
             </span>
-            <span className="text-[11px]">Advances</span>
+            <span className="text-[10px] leading-tight">Advances &amp; Fees</span>
           </button>
 
           <button

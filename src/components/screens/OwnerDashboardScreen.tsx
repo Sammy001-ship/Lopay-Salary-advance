@@ -1,6 +1,7 @@
 import React from 'react';
 import { IMAGES, INITIAL_COLLEAGUES } from '../../data/mockData';
 import { AdvanceTransaction, AppScreen, Teacher } from '../../types';
+import { AdvanceRequestsMonitor } from '../owner/AdvanceRequestsMonitor';
 
 interface OwnerDashboardScreenProps {
   teachers: Teacher[];
@@ -174,6 +175,14 @@ export const OwnerDashboardScreen: React.FC<OwnerDashboardScreenProps> = ({
             </div>
           ))}
         </div>
+      </section>
+
+      {/* Dedicated Advance User Monitor & Delivery Fees Section */}
+      <section className="space-y-2 pt-2">
+        <AdvanceRequestsMonitor
+          teachers={teachers}
+          transactions={transactions}
+        />
       </section>
 
       <section className="rounded-2xl bg-[#eff4ff] p-4">

@@ -1,6 +1,6 @@
 import React from 'react';
-import { IMAGES } from '../../data/mockData';
 import { UserRole } from '../../types';
+import { LopayLogo } from '../common/LopayLogo';
 
 interface PortalGatewayProps {
   onSelectPortal: (role: UserRole) => void;
@@ -11,12 +11,12 @@ export const PortalGateway: React.FC<PortalGatewayProps> = ({ onSelectPortal }) 
     <div className="w-full max-w-md mx-auto p-4 sm:p-6 flex flex-col justify-center min-h-[80vh] space-y-6 animate-in fade-in duration-300">
       {/* Brand Header */}
       <div className="flex flex-col items-center text-center space-y-3">
-        <img alt="Lopay Logo" src={IMAGES.logo} className="h-10 w-auto object-contain" />
+        <LopayLogo variant="full" size="md" className="mb-1" />
         <div>
-          <h1 className="text-[26px] font-bold text-[#0b1c30] tracking-tight">
+          <h1 className="text-[24px] font-bold text-[#0b1c30] tracking-tight">
             Earned Wage Access for Education
           </h1>
-          <p className="text-[13px] text-[#45464d] mt-1.5 leading-relaxed">
+          <p className="text-[13px] text-[#45464d] mt-1 leading-relaxed">
             Welcome to Lopay. Please choose your portal to sign up or sign in.
           </p>
         </div>

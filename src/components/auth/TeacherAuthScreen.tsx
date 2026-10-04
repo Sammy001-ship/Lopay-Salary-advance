@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { IMAGES, INITIAL_TEACHER, REGISTERED_SCHOOLS } from '../../data/mockData';
+import { INITIAL_TEACHER, REGISTERED_SCHOOLS } from '../../data/mockData';
 import { Teacher, AuthMode, RegisteredSchool } from '../../types';
+import { LopayLogo } from '../common/LopayLogo';
 
 interface TeacherAuthScreenProps {
   onLoginSuccess: (teacher: Teacher) => void;
@@ -117,7 +118,7 @@ export const TeacherAuthScreen: React.FC<TeacherAuthScreenProps> = ({
     <div className="w-full max-w-md mx-auto p-4 sm:p-6 flex flex-col space-y-5 animate-in fade-in duration-200">
       {/* Brand Header */}
       <div className="flex flex-col items-center text-center space-y-2">
-        <img alt="Lopay Logo" src={IMAGES.logo} className="h-9 w-auto object-contain" />
+        <LopayLogo variant="full" size="sm" showSubtitle={true} className="mb-1" />
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#006c49] text-white text-xs font-semibold shadow-xs">
           <span className="material-symbols-outlined text-[15px]">school</span>
           <span>Educator &amp; Faculty Portal</span>

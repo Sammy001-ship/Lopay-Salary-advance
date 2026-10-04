@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { IMAGES } from '../data/mockData';
 import { TeacherScreen } from '../types';
+import { LopayLogoMark } from './common/LopayLogo';
 
 interface HeaderProps {
   currentScreen: TeacherScreen;
@@ -53,20 +54,19 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             )}
 
-            <img
-              alt="Lopay Logo"
-              src={IMAGES.logo}
-              className="h-7 w-auto object-contain cursor-pointer select-none"
+            <div
+              className="flex items-center gap-2 cursor-pointer select-none"
               onClick={() => onNavigate('dashboard')}
-            />
-
-            <div className="flex flex-col min-w-0">
-              <span className="text-[13px] font-semibold text-[#0b1c30] leading-none truncate">
-                Lopay
-              </span>
-              <span className="text-[11px] text-[#006c49] font-medium leading-tight truncate">
-                {getSubtitle()}
-              </span>
+            >
+              <LopayLogoMark size={28} color="#0b1c30" accentColor="#ffffff" />
+              <div className="flex flex-col min-w-0">
+                <span className="text-[13px] font-extrabold text-[#0b1c30] tracking-[0.06em] leading-none uppercase">
+                  LOPAY
+                </span>
+                <span className="text-[10px] text-[#006c49] font-bold leading-tight truncate mt-0.5">
+                  {getSubtitle()}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -181,7 +181,7 @@ export const Header: React.FC<HeaderProps> = ({
                   setShowProfileMenu(false);
                   onNavigate('settings');
                 }}
-                className="w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-[#0b1c30] hover:bg-[#eff4ff] transition-colors"
+                className="w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-[#0b1c30] hover:bg-[#eff4ff] transition-colors cursor-pointer"
               >
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-[18px] text-[#76777d]">settings</span>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { IMAGES, DEFAULT_SCHOOL_OWNER } from '../../data/mockData';
+import { DEFAULT_SCHOOL_OWNER } from '../../data/mockData';
 import { SchoolOwner, AuthMode } from '../../types';
+import { LopayLogo } from '../common/LopayLogo';
 
 interface OwnerAuthScreenProps {
   onLoginSuccess: (owner: SchoolOwner) => void;
@@ -13,9 +14,10 @@ export const OwnerAuthScreen: React.FC<OwnerAuthScreenProps> = ({
 }) => {
   const [mode, setMode] = useState<AuthMode>('login');
 
-  // Login form state - completely empty
+  // Login form state - clean and un-prefilled
   const [loginEmail, setLoginEmail] = useState<string>('');
   const [loginPassword, setLoginPassword] = useState<string>('');
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   // Sign up form state - completely empty
   const [schoolName, setSchoolName] = useState<string>('');
@@ -32,15 +34,34 @@ export const OwnerAuthScreen: React.FC<OwnerAuthScreenProps> = ({
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    setLoginError(null);
+
+    const cleanEmail = loginEmail.trim().toLowerCase();
+    const cleanPassword = loginPassword.trim();
+
+    // Check credentials: Admin@lopay.com / Lopaydwak or registered owner
+    if (cleanEmail === 'admin@lopay.com' && cleanPassword !== 'Lopaydwak') {
+      setLoginError('Incorrect password. Please enter "Lopaydwak".');
+      return;
+    }
+
+    if (!cleanEmail) {
+      setLoginError('Please enter your admin email.');
+      return;
+    }
+
     setIsLoading(true);
 
     setTimeout(() => {
       setIsLoading(false);
       onLoginSuccess({
         ...DEFAULT_SCHOOL_OWNER,
-        email: loginEmail || DEFAULT_SCHOOL_OWNER.email,
+        name: cleanEmail === 'admin@lopay.com' ? 'Lopay School Administrator' : DEFAULT_SCHOOL_OWNER.name,
+        email: loginEmail.trim(),
+        roleTitle: 'Chief School Administrator & Director',
+        schoolName: 'Oakridge International School',
       });
-    }, 700);
+    }, 600);
   };
 
   const handleSignUp = (e: React.FormEvent) => {
@@ -77,41 +98,26 @@ export const OwnerAuthScreen: React.FC<OwnerAuthScreenProps> = ({
     <div className="w-full max-w-md mx-auto p-4 sm:p-6 flex flex-col space-y-5 animate-in fade-in duration-200">
       {/* Brand Header */}
       <div className="flex flex-col items-center text-center space-y-2">
-        <img alt="Lopay Logo" src={IMAGES.logo} className="h-9 w-auto object-contain" />
+        <LopayLogo variant="full" size="sm" showSubtitle={true} className="mb-1" />
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#131b2e] text-[#6ffbbe] text-xs font-semibold">
           <span className="material-symbols-outlined text-[15px]">admin_panel_settings</span>
           <span>School Owner &amp; Employer Portal</span>
         </div>
         <h1 className="text-2xl font-bold text-[#0b1c30] tracking-tight">
-          {mode === 'login' ? 'Sign In' : 'Register School'}
-        </h1>
-      </div>
-
-      {/* Mode Switcher Tabs */}
-      <div className="grid grid-cols-2 p-1 bg-[#e5eeff] rounded-xl text-xs font-semibold">
-        <button
-          type="button"
-          onClick={() => setMode('login')}
-          className={`py-2 rounded-lg transition-all cursor-pointer ${
-            mode === 'login' ? 'bg-white text-[#0b1c30] shadow-xs' : 'text-[#45464d] hover:text-[#0b1c30]'
-          }`}
-        >
           Sign In
-        </button>
-        <button
-          type="button"
-          onClick={() => setMode('signup')}
-          className={`py-2 rounded-lg transition-all cursor-pointer ${
-            mode === 'signup' ? 'bg-white text-[#0b1c30] shadow-xs' : 'text-[#45464d] hover:text-[#0b1c30]'
-          }`}
-        >
-          Register School
-        </button>
+        </h1>
       </div>
 
       {/* Login Card */}
       {mode === 'login' ? (
         <form onSubmit={handleLogin} className="bg-white rounded-2xl p-5 shadow-xs border border-[#eff4ff] space-y-4">
+          {loginError && (
+            <div className="p-3 bg-[#ffdad6] border border-[#ba1a1a]/30 rounded-xl text-xs font-semibold text-[#ba1a1a] flex items-center gap-2 animate-in fade-in">
+              <span className="material-symbols-outlined text-[18px]">error</span>
+              <span>{loginError}</span>
+            </div>
+          )}
+
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-[#0b1c30]">Admin Email</label>
             <div className="relative">
@@ -119,8 +125,11 @@ export const OwnerAuthScreen: React.FC<OwnerAuthScreenProps> = ({
                 type="email"
                 required
                 value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
-                placeholder=""
+                onChange={(e) => {
+                  setLoginEmail(e.target.value);
+                  if (loginError) setLoginError(null);
+                }}
+                placeholder="Enter admin email"
                 className="w-full h-12 bg-[#eff4ff] rounded-xl px-4 pl-10 text-xs text-[#0b1c30] focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#006c49]"
               />
               <span className="material-symbols-outlined absolute left-3 top-3.5 text-[18px] text-[#45464d]">
@@ -141,8 +150,11 @@ export const OwnerAuthScreen: React.FC<OwnerAuthScreenProps> = ({
                 type="password"
                 required
                 value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-                placeholder=""
+                onChange={(e) => {
+                  setLoginPassword(e.target.value);
+                  if (loginError) setLoginError(null);
+                }}
+                placeholder="Enter password"
                 className="w-full h-12 bg-[#eff4ff] rounded-xl px-4 pl-10 text-xs text-[#0b1c30] focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#006c49]"
               />
               <span className="material-symbols-outlined absolute left-3 top-3.5 text-[18px] text-[#45464d]">
@@ -241,15 +253,19 @@ export const OwnerAuthScreen: React.FC<OwnerAuthScreenProps> = ({
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[#0b1c30]">Payroll Day</label>
+              <label className="text-xs font-semibold text-[#0b1c30]">Payroll Date</label>
               <select
                 value={payrollDay}
                 onChange={(e) => setPayrollDay(Number(e.target.value))}
                 className="w-full h-11 bg-[#eff4ff] rounded-xl px-3 text-xs text-[#0b1c30] focus:bg-white focus:ring-2 focus:ring-[#006c49]"
               >
                 <option value={25}>25th Monthly</option>
+                <option value={26}>26th Monthly</option>
+                <option value={27}>27th Monthly</option>
                 <option value={28}>28th Monthly</option>
+                <option value={29}>29th Monthly</option>
                 <option value={30}>30th Monthly</option>
+                <option value={31}>31st Monthly (Month-End)</option>
               </select>
             </div>
           </div>
